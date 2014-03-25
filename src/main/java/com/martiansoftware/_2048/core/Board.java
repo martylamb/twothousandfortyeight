@@ -97,7 +97,7 @@ public class Board implements BoardView {
         private Cell(int row, int col) {
             this.row = row;
             this.col = col;
-            this.coords = String.format("(%d,%d)", col, row);
+            this.coords = String.format("%c%d", 'A' + col, row + 1);
         }
         
         public int get() { return _v; }
