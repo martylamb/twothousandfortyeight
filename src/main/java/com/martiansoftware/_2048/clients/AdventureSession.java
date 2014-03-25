@@ -241,7 +241,9 @@ public class AdventureSession implements GameListener {
     @Override
     public void gameOver() {
         out("\n\"Your game is over!\" you hear as you suddenly notice the old man behind you.\n");
-        out("You have no idea how long he has been standing there.\n");
+        out("You have no idea how long he has been standing there, and are left staring at the grid:\n\n");
+        out(game.toString());
+        out("\n");
     }
 
     @Override
