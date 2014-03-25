@@ -56,7 +56,7 @@ public class AdventureSession implements GameListener {
                     
                 case "LOOK": look(); break;
                     
-                case "Q": case "QUIT": quit(); break;
+                case "Q": case "QUIT": case "X": case "EXIT": quit(); break;
                 default: badCommand(); break;
             }
         }
@@ -98,7 +98,15 @@ public class AdventureSession implements GameListener {
         
         out("\"Your must combine grid tiles to create one with the number %d on it.\"\n\n", game.getWinTile());
         
-        out("The old man cackles and disappears.\n\n");
+        out("The old man cackles and disappears...\n\n");
+        
+        out("Then reappears again!\n\n");
+        
+        out("\"Oh yeah, if you've been here before, then you should know I've made\n");
+        out("a couple of changes.  N,S,E, and W have been replaced by U,D,R, and L.\n");
+        out("And I've made the coordinate system a bit easier to understand.\"\n\n");
+        
+        out("He cackles again but this time breaks into a couging fit as he disappears.\n\n");
         
         out("(press Return...)");
         in.readLine();
