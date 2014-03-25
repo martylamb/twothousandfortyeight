@@ -268,9 +268,9 @@ public class AdventureSession implements GameListener {
     @Override
     public void win() {
         out("\nThe old man reappears before you, looking uncomfortable.\n\n");
-        out("\"I really never expected anyone to play the whole game,\" he says.\n");
+        out("\"I really never expected anyone to play the whole game,\" he says.\n\n");
         out("\"But you got yourself a genuine %d tile.  Congratulations, I guess.\n", game.getWinTile());
-        out("Since you have so much free time, go ahead and keep playing if you like.\n\n");
+        out("Since you have so much free time, go ahead and keep playing if you like.\"\n\n");
         
         out("The old man disappears.\n\n");
     }
