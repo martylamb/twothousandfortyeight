@@ -28,6 +28,8 @@ public class AdventureSession implements GameListener {
     private Game game;
     private int badCommandCount = 0;
     private boolean showedHelp = false;
+    private boolean permacheat = false;
+    private boolean justCheated = false;
     
     public AdventureSession(InputStream in, OutputStream out, OutputStream log) {
         this.in = new LineNumberReader(new InputStreamReader(in));
@@ -39,6 +41,7 @@ public class AdventureSession implements GameListener {
         restart();
         while (!game.isGameOver()) {
             prompt();
+            justCheated = false;
             switch(userAction()) {
                 case "?": case "H": case "HELP": help(); break;
                    
@@ -57,13 +60,32 @@ public class AdventureSession implements GameListener {
                 case "LOOK": look(); break;
                     
                 case "Q": case "QUIT": case "X": case "EXIT": quit(); break;
+                    
+                case "XYZZY": permacheat(); break;
+                    
                 default: badCommand(); break;
             }
         }
     }
     
     private void prompt() {
+        if (permacheat && !justCheated) showBoard();
         out("\n> ");
+    }
+    
+    private void showBoard() {
+        out("\n");
+        out (game.toString());
+        out("Current score: %d\n", game.getScore());                                
+    }
+    
+    private void permacheat() {
+        if (permacheat) {
+            out("As you shout the magic word, the grid again becomes impossible to take in all at once.\n");
+        } else {
+            out("You cast the spell and with a flash the grid becomes comprehensible in its entirety!\n");
+        }
+        permacheat = !permacheat;
     }
     
     private void badCommand() {
@@ -87,9 +109,13 @@ public class AdventureSession implements GameListener {
         out("------------------------\n\n");
         out("West of House\n");
         out("You are standing in an open field west of a white house, with a boarded\nfront door.  ");
-        out("There is a %dx%d grid here, with columns marked A-%c and rows marked 1-%d.\n\n", game.colCount(), game.rowCount(), 'A' + game.colCount(), game.rowCount() + 1);
+        out("There is a %dx%d grid here, with columns marked A-%c and rows marked 1-%d.\n", game.colCount(), game.rowCount(), 'A' + game.colCount() - 1, game.rowCount());
+        out("The grid is beautiful - so beautiful in fact that your mind cannot process it\n");
+        out("all at once.  You find that the best you can do is look at small parts of the grid\n");
+        out("a bit at a time.\n\n");
         
-        out("Through a dirty window, the wrinkled face of an old man appears.\n");
+        out("Unsure how long you have been standing there, shocked at the grid's beauty,\n");
+        out("you notice the wrinkled face of an old man appearing through a dirty window.\n");
         out("He gazes down at you and intones as follows:\n\n");
         
         out("\"I am the master of the grid, whose task it is to insure that none\n");
@@ -98,15 +124,10 @@ public class AdventureSession implements GameListener {
         
         out("\"Your must combine grid tiles to create one with the number %d on it.\"\n\n", game.getWinTile());
         
-        out("The old man cackles and disappears...\n\n");
+        out("The old man cackles and disappears.\n\n");
         
-        out("Then reappears again!\n\n");
-        
-        out("\"Oh yeah, if you've been here before, then you should know I've made\n");
-        out("a couple of changes.  N,S,E, and W have been replaced by U,D,R, and L.\n");
-        out("And I've made the coordinate system a bit easier to understand.\"\n\n");
-        
-        out("He cackles again but this time breaks into a couging fit as he disappears.\n\n");
+        out("You think you can still hear is voice, telling you you say 'Up', 'Down',\n");
+        out("'Left', and 'Right' to control the grid.  Or maybe you are imagining that.\n\n");
         
         out("(press Return...)");
         in.readLine();
@@ -116,6 +137,7 @@ public class AdventureSession implements GameListener {
                 "In the distance a wolf howls.  You look at the grid.",
                 "You find yourself transfixed by the grid.",
                 "You realize this is stupid, but are drawn to the grid nonetheless."));
+        out("Although still unable to behold the entire grid, you can make out some motion...\n");
         game.start();
     }
     
@@ -123,6 +145,7 @@ public class AdventureSession implements GameListener {
         out("I told you, you see a grid.  Sheesh.\n");
         out("Who said this was a valid command, anyway?\n\n");
     }
+    
     private void cheat() {
         if (game.getTurnCount() == 0) {
             out(oneOf(
@@ -131,9 +154,9 @@ public class AdventureSession implements GameListener {
                     "You just can't wait to cheat, can you?  At least try a move first.\n"));
         } else {
             out("Cheater.\n");
-            out(game.toString());
-            out("Current score: %d\n", game.getScore());            
+            showBoard();      
         }
+        justCheated = true;
     }
     
     private void help() {
