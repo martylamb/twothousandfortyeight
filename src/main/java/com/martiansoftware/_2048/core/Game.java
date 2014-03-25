@@ -75,8 +75,11 @@ public class Game implements BoardView {
         boolean alreadyWon = _win;
         _turnScore = 0;
         _listeners.turnStarted(_turn);
-        if (!collapse(bv, false)) _listeners.turnDidNothing();
-        fillAnEmptyCell();
+        if (collapse(bv, false)) {
+            fillAnEmptyCell();
+        } else {
+            _listeners.turnDidNothing();
+        }
         if (_turnScore != 0) {
             _totalScore += _turnScore;
             _listeners.points(_turnScore, _totalScore);
