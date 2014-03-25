@@ -44,6 +44,7 @@ public class Board implements BoardView {
     }
     
     private void hr(StringBuilder s) {
+        s.append("    ");
         for (int c = 0; c < colCount; ++c) s.append("--------");
         s.append("\n");        
     }
@@ -51,12 +52,15 @@ public class Board implements BoardView {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-    
+        
+        s.append("     ");
+        for (int c = 0; c < colCount; ++c) s.append(String.format("   %c    ", 'A' + c));
+        s.append("\n");
         hr(s);
         for (int r = 0; r < rowCount; ++r) {
+            s.append(String.format(" %2s", r + 1));
             for (int c = 0; c < colCount; ++c) {
-                if (c > 0) s.append(' ');
-                s.append("| ");
+                s.append(" | ");
                 s.append(cell[r][c]);
                 s.append(' ');
             }
