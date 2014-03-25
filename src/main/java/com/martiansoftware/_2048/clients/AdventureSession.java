@@ -87,7 +87,7 @@ public class AdventureSession implements GameListener {
         out("------------------------\n\n");
         out("West of House\n");
         out("You are standing in an open field west of a white house, with a boarded\nfront door.  ");
-        out("There is a %dx%d grid here.\n\n", game.colCount(), game.rowCount());
+        out("There is a %dx%d grid here, with columns marked A-%c and rows marked 1-%d.\n\n", game.colCount(), game.rowCount(), 'A' + game.colCount(), game.rowCount() + 1);
         
         out("Through a dirty window, the wrinkled face of an old man appears.\n");
         out("He gazes down at you and intones as follows:\n\n");
@@ -126,9 +126,9 @@ public class AdventureSession implements GameListener {
     private void cheat() {
         if (game.getTurnCount() == 0) {
             out(oneOf(
-                    "Seriously?  It's a blank grid, man.  If you can't visualize THAT you don't stand a chance.\n",
-                    "Are you kidding?  The game hasn't even started yet.\n",
-                    "You just can't wait to cheat, can you?\n"));
+                    "Seriously?  Only two cells are full and I JUST TOLD YOU where!\nIf you can't visualize THAT you don't stand a chance.\n",
+                    "Are you kidding?  The game just started!\n",
+                    "You just can't wait to cheat, can you?  At least try a move first.\n"));
         } else {
             out("Cheater.\n");
             out(game.toString());
