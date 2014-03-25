@@ -34,7 +34,7 @@ public class App {
 
         
         System.out.println(g);
-        g.S();
+        g.D();
         System.out.println(g);
     }
     

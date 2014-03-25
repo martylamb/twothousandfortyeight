@@ -32,10 +32,10 @@ public class Game implements BoardView {
         
     }
 
-    public void N() { doTurn(NORTH_DOWN); }
-    public void S() { doTurn(SOUTH_DOWN); }
-    public void E() { doTurn(EAST_DOWN); }
-    public void W() { doTurn(WEST_DOWN); }
+    public void U() { doTurn(NORTH_DOWN); }
+    public void D() { doTurn(SOUTH_DOWN); }
+    public void R() { doTurn(EAST_DOWN); }
+    public void L() { doTurn(WEST_DOWN); }
     public boolean isGameStarted() { return _started; }
     public boolean isGameOver() { return _gameOver; }
     public boolean isGameQuit() { return _quit; }

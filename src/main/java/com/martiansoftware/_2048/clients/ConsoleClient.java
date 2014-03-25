@@ -36,10 +36,10 @@ public class ConsoleClient {
             out("N,S,E,W: ");                    
             String cmd = in().trim().toUpperCase();
             switch(cmd) {
-                case "N": g.N(); break;
-                case "S": g.S(); break;
-                case "E": g.E(); break;
-                case "W": g.W(); break;
+                case "N": g.U(); break;
+                case "S": g.D(); break;
+                case "E": g.R(); break;
+                case "W": g.L(); break;
                 case "Q": g.quit(); break;
                 default: out("Huh?\n");
             }

@@ -42,19 +42,19 @@ public class AdventureSession implements GameListener {
             switch(userAction()) {
                 case "?": case "H": case "HELP": help(); break;
                    
-                case "N": case "NORTH": game.N(); break;
+                case "U": case "UP": game.U(); break;
                     
-                case "S": case "SOUTH": game.S(); break;
+                case "D": case "DOWN": game.D(); break;
                     
-                case "E": case "EAST": game.E(); break;
+                case "R": case "RIGHT": game.R(); break;
                     
-                case "W": case "WEST": game.W(); break;
+                case "L": case "LEFT": game.L(); break;
                 
                 case "C": case "CHEAT": cheat(); break;
                     
-                case "R": case "RESTART": restart(); break;
+                case "RESTART": restart(); break;
                     
-                case "L": case "LOOK": look(); break;
+                case "LOOK": look(); break;
                     
                 case "Q": case "QUIT": quit(); break;
                 default: badCommand(); break;
@@ -133,8 +133,9 @@ public class AdventureSession implements GameListener {
         
         out("OK, here's how this works:\n\n");
         
-        out("  1. The grid can be shifted with the commands 'North', 'South', 'East', and 'West'.\n");
-        out("  2. If the description of the grid is not enough for you, use 'Cheat'.\n");
+        out("  1. The grid can be shifted with the commands 'Up', 'Down', 'Left', and 'Right',\n"
+           +"     or just the first letter of each.");
+        out("  2. If the description of the grid is not enough for you, use 'Cheat' or 'C'.\n");
         out("  3. You can start over with 'Restart'.");
         out("  4. You can also 'Quit'\n");
         out("  5. 'Help' or '?' shows this message.\n\n");
@@ -251,7 +252,7 @@ public class AdventureSession implements GameListener {
                 "A great clap of thunder startles you and a loud voice from the heavens shouts \"%d POINTS TO YOU!\"\nIf your math is right, that makes for a total score of %d.\n",
                 "You earn %d more points and now have somewhere around %d.\n",
                 "You got some points or something.\n",
-                "You momentarily become one with the universe and, in your state of total consciousness.\n" +
+                "You momentarily become one with the universe and, in your state of total consciousness,\n" +
                 "know that you just got %d more points.  So you've got that going for you, which is nice.\n"
         ), newPoints, score);
     }
