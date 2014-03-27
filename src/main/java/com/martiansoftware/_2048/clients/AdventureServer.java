@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- *
+ * TODO: switch to async io.  Threads per session were trivial to implement but are terrible for scaling.
  * @author mlamb
  */
 public class AdventureServer {
