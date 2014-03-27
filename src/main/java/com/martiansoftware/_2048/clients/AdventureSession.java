@@ -30,6 +30,7 @@ public class AdventureSession implements GameListener {
     private boolean showedHelp = false;
     private boolean permacheat = false;
     private boolean justCheated = false;
+    private int cheatCount = 0;
     
     public AdventureSession(InputStream in, OutputStream out, OutputStream log) {
         this.in = new LineNumberReader(new InputStreamReader(in));
@@ -130,8 +131,8 @@ public class AdventureSession implements GameListener {
         
         out("The old man cackles and disappears.\n\n");
         
-        out("You think you can still hear is voice, telling you you say 'Up', 'Down',\n");
-        out("'Left', and 'Right' to control the grid.  Or maybe you are imagining that.\n\n");
+        out("You think you can still hear his voice, telling you you say '(U)p', '(D)own',\n");
+        out("'(L)eft', and '(R)ight' to control the grid.  Or maybe you are imagining that.\n\n");
         
         out("(press Return...)");
         in.readLine();
@@ -157,8 +158,13 @@ public class AdventureSession implements GameListener {
                     "Are you kidding?  The game just started!\n",
                     "You just can't wait to cheat, can you?  At least try a move first.\n"));
         } else {
+            ++cheatCount;
             out("Cheater.\n");
             showBoard();      
+            if (cheatCount == 3) {
+                out("\nYou hear the old man's voice in your mind, as if from very far away.\n");
+                out("\"An ancient magic incantation will save you from this trouble...\"\n");
+            }
         }
         justCheated = true;
     }
