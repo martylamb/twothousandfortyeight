@@ -106,7 +106,11 @@ public class AdventureSession implements GameListener {
     
     private void intro() throws IOException {
         out("\n\nTwo Thousand Forty-Eight\n");
-        out("------------------------\n\n");
+        out("------------------------\n");
+        out("Marty Lamb, Martian Software, Inc.\n\n");
+        out("Based on 2048 by Gabriele Cirulli, which is based on 1024 by Veewo Studio,\n");
+        out("and conceptually similar to Threes by Asher Vollmer.\n\n");
+                
         out("West of House\n");
         out("You are standing in an open field west of a white house, with a boarded\nfront door.  ");
         out("There is a %dx%d grid here, with columns marked A-%c and rows marked 1-%d.\n", game.colCount(), game.rowCount(), 'A' + game.colCount() - 1, game.rowCount());
@@ -122,7 +126,7 @@ public class AdventureSession implements GameListener {
         out("but the most scholarly and masterful adventurers waste their time here.\n");
         out("You appear to be neither... but whatever.\"\n\n");
         
-        out("\"Your must combine grid tiles to create one with the number %d on it.\"\n\n", game.getWinTile());
+        out("\"You must combine grid tiles to create one with the number %d on it.\"\n\n", game.getWinTile());
         
         out("The old man cackles and disappears.\n\n");
         
