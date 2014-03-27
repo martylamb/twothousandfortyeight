@@ -12,18 +12,18 @@ import java.net.Socket;
  */
 public class AdventureServer {
 
-    private static File logDir;
+    private static File logDir = null;
     
     private static void startSession(final Socket s) {
         Runnable r = new Runnable() {
             public void run() {
                 try {
-                    String sessionID = s.getRemoteSocketAddress().toString().replaceAll(":", "_").replaceAll("/", "") + "_" + System.currentTimeMillis();
-                    FileOutputStream fout = new FileOutputStream(new File(logDir, sessionID + ".txt"));
+                    String sessionID = s.getRemoteSocketAddress().toString().replaceAll(":", "_").replaceAll("/", "") + "_" + System.currentTimeMillis();                    
+                    FileOutputStream fout = (logDir == null) ? null : new FileOutputStream(new File(logDir, sessionID + ".txt"));
                     System.out.format("Session started: %s\n", sessionID);
                     AdventureSession a = new AdventureSession(s.getInputStream(), s.getOutputStream(), fout);
                     a.play();
-                    fout.close();
+                    if (fout != null) fout.close();
                     s.close();
                     System.out.format("Session finished: %s\n", sessionID);                    
                 } catch (IOException e) {
@@ -35,15 +35,15 @@ public class AdventureServer {
     }
     
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            System.err.println("Specify a log directory.");
-            System.exit(1);
-        }
-        logDir = new File(args[0]);
-        if (!logDir.isDirectory()) {
-            System.err.println("That's not a directory.");
-            System.exit(1);
-        }
+//        if (args.length != 1) {
+//            System.err.println("Specify a log directory.");
+//            System.exit(1);
+//        }
+//        logDir = new File(args[0]);
+//        if (!logDir.isDirectory()) {
+//            System.err.println("That's not a directory.");
+//            System.exit(1);
+//        }
         ServerSocket ss = new ServerSocket(2048);       
         System.out.println("Listening for connections...");
         while(true) startSession(ss.accept());        
