@@ -152,8 +152,9 @@ public class AdventureSession implements GameListener {
         
         out("The old man cackles and disappears.\n\n");
         
-        out("You think you can still hear his voice, telling you you say '(U)p', '(D)own',\n");
-        out("'(L)eft', and '(R)ight' to control the grid.  Or maybe you are imagining that.\n\n");
+        out("You think you can still hear his voice, telling you to use '(U)p', '(D)own',\n");
+        out("'(L)eft', and '(R)ight' to control the grid and to ask for '(H)elp' if you need it.\n");
+        out("Or maybe you are imagining that.\n\n");
         
         out("(press Return...)");
         in.readLine();
@@ -191,8 +192,6 @@ public class AdventureSession implements GameListener {
     }
     
     private void help() {
-        out("Not too smart, are you?\n\n");
-        
         out("OK, here's how this works:\n\n");
         
         out("  1. The grid can be shifted with the commands 'Up', 'Down', 'Left', and 'Right',\n"
@@ -202,7 +201,7 @@ public class AdventureSession implements GameListener {
         out("  4. You can also 'Quit'\n");
         out("  5. 'Help' or '?' shows this message.\n\n");
         
-        out("Also - any command can be abbreviated to its first letter.\n");
+        out("Some commands can be abbreviated to their first letter.\n");
         showedHelp = true;
     }
     
