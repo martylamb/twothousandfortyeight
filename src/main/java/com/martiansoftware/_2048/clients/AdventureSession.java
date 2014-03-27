@@ -10,6 +10,7 @@ import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -20,10 +21,12 @@ public class AdventureSession implements GameListener {
     private static final int DEFAULT_WIDTH = 4;
     private static final int DEFAULT_HEIGHT = 4;
     private static final int DEFAULT_WINTILE = 2048;
+    private static SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:MM:ss.SSS");
     
     private final LineNumberReader in;
     private final PrintWriter out;
     private final PrintWriter log;
+    private final String sessionID;
     
     private Game game;
     private int badCommandCount = 0;
@@ -32,40 +35,57 @@ public class AdventureSession implements GameListener {
     private boolean justCheated = false;
     private int cheatCount = 0;
     
-    public AdventureSession(InputStream in, OutputStream out, OutputStream log) {
+    public AdventureSession(InputStream in, OutputStream out, String sessionID, OutputStream log) {
         this.in = new LineNumberReader(new InputStreamReader(in));
         this.out = new PrintWriter(new OutputStreamWriter(out));
+        this.sessionID = sessionID;
         this.log = (log == null) ? null : new PrintWriter(new OutputStreamWriter(log));
     }
     
-    public void play() throws IOException {
-        restart();
-        while (!game.isGameOver()) {
-            prompt();
-            justCheated = false;
-            switch(userAction()) {
-                case "?": case "H": case "HELP": help(); break;
-                   
-                case "U": case "UP": game.U(); break;
-                    
-                case "D": case "DOWN": game.D(); break;
-                    
-                case "R": case "RIGHT": game.R(); break;
-                    
-                case "L": case "LEFT": game.L(); break;
-                
-                case "C": case "CHEAT": cheat(); break;
-                    
-                case "RESTART": restart(); break;
-                    
-                case "LOOK": look(); break;
-                    
-                case "Q": case "QUIT": case "X": case "EXIT": quit(); break;
-                    
-                case "XYZZY": permacheat(); break;
-                    
-                default: badCommand(); break;
+    public void play() {
+        log("New session started.");
+        try {
+            restart();
+            while (!game.isGameOver()) {
+                prompt();
+                justCheated = false;
+                String cmd = userAction();
+                switch(cmd) {
+                    case "?": case "H": case "HELP": help(); break;
+
+                    case "U": case "UP": game.U(); break;
+
+                    case "D": case "DOWN": game.D(); break;
+
+                    case "R": case "RIGHT": game.R(); break;
+
+                    case "L": case "LEFT": game.L(); break;
+
+                    case "C": case "CHEAT": cheat(); break;
+
+                    case "RESTART": restart(); break;
+
+                    case "LOOK": look(); break;
+
+                    case "Q": case "QUIT": case "X": case "EXIT": quit(); break;
+
+                    case "XYZZY": permacheat(); break;
+
+                    default: badCommand(cmd); break;
+                }
             }
+        } catch (IOException e) {
+            log(e.getMessage() + " at " + e.getStackTrace()[0]);
+        } finally {
+            log("Session finished.");
+        }
+    }
+    
+    private void log(String f, Object... o) {
+        synchronized(sdf) {
+            System.out.printf("%s  %s  ", sdf.format(new java.util.Date()), sessionID);
+            System.out.printf(f, o);
+            System.out.println();
         }
     }
     
@@ -89,7 +109,8 @@ public class AdventureSession implements GameListener {
         permacheat = !permacheat;
     }
     
-    private void badCommand() {
+    private void badCommand(String cmd) {
+        log("Unrecognized command \"%s\"", cmd);
         out("%s\n", oneOf("Huh?", "What?", "Come again?", "That doesn't make sense.", "I don't understand.", "You sound like an idiot."));
         ++badCommandCount;
         if (badCommandCount == 3 && !showedHelp) help();
@@ -217,7 +238,7 @@ public class AdventureSession implements GameListener {
     private <T> T oneOf(T... t) { return t[randomIntBelow(t.length)];  }
     
     public static void main(String[] args) throws IOException {
-        AdventureSession a = new AdventureSession(System.in, System.out, null);
+        AdventureSession a = new AdventureSession(System.in, System.out, "Console", null);
         a.play();
     }
 

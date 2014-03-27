@@ -13,19 +13,18 @@ import java.net.Socket;
 public class AdventureServer {
 
     private static File logDir = null;
+    private static long sessionCounter = 0;
     
     private static void startSession(final Socket s) {
         Runnable r = new Runnable() {
             public void run() {
                 try {
-                    String sessionID = s.getRemoteSocketAddress().toString().replaceAll(":", "_").replaceAll("/", "") + "_" + System.currentTimeMillis();                    
+                    String sessionID = s.getRemoteSocketAddress().toString().replaceAll(":", "_").replaceAll("/", "") + "_" + (++sessionCounter);                    
                     FileOutputStream fout = (logDir == null) ? null : new FileOutputStream(new File(logDir, sessionID + ".txt"));
-                    System.out.format("Session started: %s\n", sessionID);
-                    AdventureSession a = new AdventureSession(s.getInputStream(), s.getOutputStream(), fout);
+                    AdventureSession a = new AdventureSession(s.getInputStream(), s.getOutputStream(), sessionID, fout);
                     a.play();
                     if (fout != null) fout.close();
                     s.close();
-                    System.out.format("Session finished: %s\n", sessionID);                    
                 } catch (IOException e) {
                     e.printStackTrace();
                 }                
