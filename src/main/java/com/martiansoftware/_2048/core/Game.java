@@ -101,7 +101,7 @@ public class Game implements BoardView {
     private void fillAnEmptyCell() {
         Cell c = getRandomEmptyCell();
         if (c != null) {
-            c.set(2);
+            c.set(Math.random() < 0.9 ? 2 : 4);
             _listeners.cellAdded(c);
         }
     }
