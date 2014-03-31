@@ -39,7 +39,7 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <configuration>
-                        <mainClass>com.martiansoftware._2048.clients.AdventureServer</mainClass>
+                        <mainClass>com.martiansoftware._2048.clients.Launcher</mainClass>
                     </configuration>
                 </plugin>
             </plugins>
