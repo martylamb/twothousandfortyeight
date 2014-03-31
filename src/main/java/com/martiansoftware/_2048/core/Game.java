@@ -14,7 +14,7 @@ public class Game implements BoardView {
     private final GameListenerCollection _listeners = new GameListenerCollection();
     private int _turn = 0;
     private boolean _gameOver = false, _quit = false, _win = false;
-    private int _turnScore = 0, _totalScore = 0;
+    private int _turnScore = 0, _totalScore = 0, _maxTile = 0;
     private int _winTile = 2048;
     private boolean _started = false;
     
@@ -40,6 +40,7 @@ public class Game implements BoardView {
     public boolean isGameOver() { return _gameOver; }
     public boolean isGameQuit() { return _quit; }
     public int getScore() { return _totalScore; }
+    public int getMaxTile() { return _maxTile; }
     public int getTurnCount() { return _turn; }
     public int getWinTile() { return _winTile; }
     public void setWinTile(int winTile) { _winTile = winTile; }
@@ -142,6 +143,7 @@ public class Game implements BoardView {
             if (justChecking) return true;
             to.set(from.get() + to.get());            
             _turnScore += to.get();
+            _maxTile = Math.max(_maxTile, to.get());
             from.clear();
             if (!_win && to.get() == _winTile) _win = true;
             return true;

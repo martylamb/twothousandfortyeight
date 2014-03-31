@@ -27,7 +27,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.martiansoftware._2048.clients.AdventureServer</mainClass>
+                            <mainClass>com.martiansoftware._2048.clients.Launcher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

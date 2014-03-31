@@ -3,142 +3,126 @@ package com.martiansoftware._2048.clients;
 import com.martiansoftware._2048.core.Board;
 import com.martiansoftware._2048.core.Game;
 import com.martiansoftware._2048.core.GameListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 
 /**
  *
  * @author mlamb
  */
-public class AdventureSession implements GameListener {
+class AdventureSession implements GameListener, TextMachine  {
 
     private static final int DEFAULT_WIDTH = 4;
     private static final int DEFAULT_HEIGHT = 4;
     private static final int DEFAULT_WINTILE = 2048;
-    private static SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd HH:MM:ss.SSS");
     
-    private final LineNumberReader in;
-    private final PrintWriter out;
-    private final PrintWriter log;
-    private final String sessionID;
+    private final String _logId;
+    private final StringBuilder _out = new StringBuilder();
     
-    private Game game;
-    private int badCommandCount = 0;
-    private boolean showedHelp = false;
-    private boolean permacheat = false;
-    private boolean justCheated = false;
-    private int cheatCount = 0;
+    private Game _game;
+    private int _badCommandCount = 0;
+    private boolean _showedHelp = false;
+    private boolean _permacheat = false;
+    private boolean _justCheated = false;
+    private int _cheatCount = 0;
+    private boolean _finishedIntro = false;
+    private boolean _logEnabled = true;
     
-    public AdventureSession(InputStream in, OutputStream out, String sessionID, OutputStream log) {
-        this.in = new LineNumberReader(new InputStreamReader(in));
-        this.out = new PrintWriter(new OutputStreamWriter(out));
-        this.sessionID = sessionID;
-        this.log = (log == null) ? null : new PrintWriter(new OutputStreamWriter(log));
+    public AdventureSession(String logId) {
+        _logId = logId;
+        restart();
+    }
+
+    public AdventureSession() {
+        this(null);
     }
     
-    public void play() {
-        log("New session started.");
-        try {
-            restart();
-            while (!game.isGameOver()) {
-                prompt();
-                justCheated = false;
-                String cmd = userAction();
-                switch(cmd) {
-                    case "?": case "H": case "HELP": help(); break;
+    private void log(String f, Object... params) {
+        if (_logEnabled) Log.log(_logId, f, params);
+    }        
+    
+    public void setLogEnabled(boolean logEnabled) {
+        this._logEnabled = logEnabled;        
+    }
+    
+    @Override
+    public String start() {
+        intro();
+        return getOutput();
+    }
 
-                    case "U": case "UP": game.U(); break;
-
-                    case "D": case "DOWN": game.D(); break;
-
-                    case "R": case "RIGHT": game.R(); break;
-
-                    case "L": case "LEFT": game.L(); break;
-
-                    case "C": case "CHEAT": cheat(); break;
-
-                    case "RESTART": restart(); break;
-
-                    case "LOOK": look(); break;
-
-                    case "Q": case "QUIT": case "X": case "EXIT": quit(); break;
-
-                    case "XYZZY": permacheat(); break;
-
-                    default: badCommand(cmd); break;
-                }
-            }
-        } catch (IOException e) {
-            log(e.getMessage() + " at " + e.getStackTrace()[0]);
-        } finally {
-            log("Session finished.");
+    @Override
+    public String handle(String text) {
+        _justCheated = false;
+        text = text.trim().toUpperCase();
+        if (!_finishedIntro) {
+            intro2();            
+        } else switch(text) {
+            case "?": case "H": case "HELP": help(); break;
+            case "W": case "UP": _game.U(); break;
+            case "S": case "DOWN": _game.D(); break;
+            case "D": case "RIGHT": _game.R(); break;
+            case "A": case "LEFT": _game.L(); break;
+            case "C": case "CHEAT": cheat(); break;
+            case "RESTART": restart(); break;
+            case "L": case "LOOK": look(); break;
+            case "QUIT": case "EXIT": quit(); break;
+            case "XYZZY": permacheat(); break;
+            default: badCommand(text); break;
         }
+        if (!isFinished()) prompt();
+        return getOutput();
     }
-    
-    private void log(String f, Object... o) {
-        synchronized(sdf) {
-            System.out.printf("%s  %s  ", sdf.format(new java.util.Date()), sessionID);
-            System.out.printf(f, o);
-            System.out.println();
-        }
-    }
-    
+
+    @Override
+    public boolean isFinished() { return _game.isGameOver(); }
+        
     private void prompt() {
-        if (permacheat && !justCheated) showBoard();
+        if (_permacheat && !_justCheated) showBoard();
         out("\n> ");
     }
     
     private void showBoard() {
         out("\n");
-        out (game.toString());
-        out("Current score: %d\n", game.getScore());                                
+        out (_game.toString());
+        out("Current score: %d\n", _game.getScore());                                
     }
     
     private void permacheat() {
-        if (permacheat) {
-            out("As you shout the magic word, the grid again becomes impossible to take in all at once.\n");
+        if (_permacheat) {
+            out("As you shout the magic word, the grid again becomes impossible to\ntake in all at once.\n");
         } else {
-            out("You cast the spell and with a flash the grid becomes comprehensible in its entirety!\n");
+            out("You cast the spell and with a flash the grid becomes comprehensible\nin its entirety!\n");
         }
-        permacheat = !permacheat;
+        _permacheat = !_permacheat;
     }
     
     private void badCommand(String cmd) {
+        if (cmd.length() == 0) return;
         log("Unrecognized command \"%s\"", cmd);
-        out("%s\n", oneOf("Huh?", "What?", "Come again?", "That doesn't make sense.", "I don't understand.", "You sound like an idiot."));
-        ++badCommandCount;
-        if (badCommandCount == 3 && !showedHelp) help();
+        out("%s\n", oneOf("Huh?", "What?", "Come again?", "That doesn't make sense.", "I don't understand."));
+        ++_badCommandCount;
+        if (_badCommandCount == 3 && !_showedHelp) help();
     }
 
     private void initGame() {
-        game = new Game(DEFAULT_WIDTH, DEFAULT_HEIGHT, this);
-        game.setWinTile(DEFAULT_WINTILE);
+        _game = new Game(DEFAULT_WIDTH, DEFAULT_HEIGHT, this);
+        _game.setWinTile(DEFAULT_WINTILE);
     }
 
-    private void restart() throws IOException {
+    private void restart() {
         initGame();
-        intro();        
+        intro();  
     }
     
-    private void intro() throws IOException {
-        out("\n\nTwo Thousand Forty-Eight\n");
-        out("------------------------\n");
-        out("Marty Lamb, Martian Software, Inc.\n\n");
-        out("Based on 2048 by Gabriele Cirulli, which is based on 1024 by Veewo Studio,\n");
-        out("and conceptually similar to Threes by Asher Vollmer.\n\n");
-                
-        out("West of House\n");
+    private void intro() {
+        out("\n\nTwo Thousand Forty-Eight, by Marty Lamb\n");
+        out("An adventurous port of Gabriele Cirulli's \"2048\"\n\n");
+
         out("You are standing in an open field west of a white house, with a boarded\nfront door.  ");
-        out("There is a %dx%d grid here, with columns marked A-%c and rows marked 1-%d.\n", game.colCount(), game.rowCount(), 'A' + game.colCount() - 1, game.rowCount());
+        out("There is a %dx%d grid here, with columns marked A-%c and rows\n", _game.colCount(), _game.rowCount(), 'A' + _game.colCount() - 1);
+        out("marked 1-%d.\n\n", _game.rowCount());
+        
         out("The grid is beautiful - so beautiful in fact that your mind cannot process it\n");
-        out("all at once.  You find that the best you can do is look at small parts of the grid\n");
-        out("a bit at a time.\n\n");
+        out("all at once;  You can only look at parts of the grid a bit at a time.\n\n");
         
         out("Unsure how long you have been standing there, shocked at the grid's beauty,\n");
         out("you notice the wrinkled face of an old man appearing through a dirty window.\n");
@@ -148,24 +132,29 @@ public class AdventureSession implements GameListener {
         out("but the most scholarly and masterful adventurers waste their time here.\n");
         out("You appear to be neither... but whatever.\"\n\n");
         
-        out("\"You must combine grid tiles to create one with the number %d on it.\"\n\n", game.getWinTile());
+        out("\"You must combine grid tiles to create one with the number %d on it.\"\n\n", _game.getWinTile());
         
         out("The old man cackles and disappears.\n\n");
-        
-        out("You think you can still hear his voice, telling you to use '(U)p', '(D)own',\n");
-        out("'(L)eft', and '(R)ight' to control the grid and to ask for '(H)elp' if you need it.\n");
-        out("Or maybe you are imagining that.\n\n");
-        
+                
         out("(press Return...)");
-        in.readLine();
+        _finishedIntro = false;
+    }
+    
+    private void intro2() {
         out("\n");
+        out("You think you can still hear his voice, telling you to use 'Up', 'Down',\n");
+        out("'Left', and 'Right' (or WASD if you prefer) to control the grid and to ask\n");
+        out("for 'Help' if you need it.\n\n");
+        out("Or maybe you are imagining that.\n\n");        
+        
         out("%s\n", oneOf(
                 "The grid shudders for a moment.",
                 "In the distance a wolf howls.  You look at the grid.",
                 "You find yourself transfixed by the grid.",
                 "You realize this is stupid, but are drawn to the grid nonetheless."));
         out("Although still unable to behold the entire grid, you can make out some motion...\n");
-        game.start();
+        _game.start();
+        _finishedIntro = true;
     }
     
     private void look() {
@@ -174,73 +163,53 @@ public class AdventureSession implements GameListener {
     }
     
     private void cheat() {
-        if (game.getTurnCount() == 0) {
+        if (_game.getTurnCount() == 0) {
             out(oneOf(
                     "Seriously?  Only two cells are full and I JUST TOLD YOU where!\nIf you can't visualize THAT you don't stand a chance.\n",
                     "Are you kidding?  The game just started!\n",
                     "You just can't wait to cheat, can you?  At least try a move first.\n"));
         } else {
-            ++cheatCount;
+            ++_cheatCount;
             out("Cheater.\n");
             showBoard();      
-            if (cheatCount == 3) {
-                out("\nYou hear the old man's voice in your mind, as if from very far away.\n");
+            if (_cheatCount == 3) {
+                out("\nYou hear the old man's echo in your mind, as if from a colossal\ncave, very far away.\n\n");
                 out("\"An ancient magic incantation will save you from this trouble...\"\n");
             }
         }
-        justCheated = true;
+        _justCheated = true;
     }
     
     private void help() {
-        out("OK, here's how this works:\n\n");
+        out("\nOK, here's how this works:\n\n");
         
-        out("  1. The grid can be shifted with the commands 'Up', 'Down', 'Left', and 'Right',\n"
-           +"     or just the first letter of each.");
-        out("  2. If the description of the grid is not enough for you, use 'Cheat' or 'C'.\n");
+        out("  1. The grid can be shifted with the commands 'Up', 'Down',\n");
+        out("     'Left', and 'Right', or the letter 'W', 'A', 'S', and 'D'.\n");
+        out("  2. If the description of the grid is not enough for you, use\n");
+        out("     'Cheat' or 'C'.\n");
         out("  3. You can start over with 'Restart'.");
         out("  4. You can also 'Quit'\n");
         out("  5. 'Help' or '?' shows this message.\n\n");
         
         out("Some commands can be abbreviated to their first letter.\n");
-        showedHelp = true;
+        _showedHelp = true;
     }
     
     private void quit() {
-        game.quit();
+        _game.quit();
     }
-    
-    private String userAction() throws IOException {        
-        String s = "";
-        while (s.length() == 0) {
-            s = in.readLine();
-            if (s == null) return null;
-            s = s.trim().toUpperCase();            
-        }
-        out("\n");
-        if (log != null) log.printf("%s\n", s);
-        return s;
-    }
-    
-    private void out(String f, Object... o) {
-        String msg = String.format(f, o);
         
-        out.printf(msg);
-        out.flush();
-        
-        if (log != null) {
-            log.printf(msg);
-            log.flush();
-        }
+    private void out(String f, Object... o) { _out.append(String.format(f, o)); }
+    
+    private String getOutput() {
+        String result = _out.toString();
+        _out.setLength(0);
+        return result;
     }
 
     private int randomIntBelow(int i) { return (int) (Math.random() * i);  }
     private <T> T oneOf(T... t) { return t[randomIntBelow(t.length)];  }
     
-    public static void main(String[] args) throws IOException {
-        AdventureSession a = new AdventureSession(System.in, System.out, "Console", null);
-        a.play();
-    }
-
     @Override
     public void turnStarted(int turnNumber) {}
 
@@ -272,8 +241,8 @@ public class AdventureSession implements GameListener {
 
     @Override
     public void cellsMerged(Board.Cell from, Board.Cell to) {
-        out(oneOf("You watch in awe as %s is absorbed into %s, which now shows the number %d.\n",
-                    "A wizard casts a spell on %s and it disappears!  %s then glows and changes to %d.\n",
+        out(oneOf("You watch in awe as %s is absorbed into %s,nwhich now shows the number %d.\n",
+                    "A wizard casts a spell on %s and it disappears!\n%s then glows and changes to %d.\n",
                     "%s is eaten by %s, which belches and changes to %d.\n",
                     "A goblin erases %s, and replaces %s with %d.\n"
         ), from.coords, to.coords, to.get());
@@ -282,21 +251,29 @@ public class AdventureSession implements GameListener {
     @Override
     public void cellAdded(Board.Cell cell) {
         out(
-            oneOf("You hear a distant hum, then suddenly the number %d appears in grid cell %s.\n",
+            oneOf("You hear a distant hum, then the number %d appears in grid cell %s.\n",
                     "Faeries appear and paint the number %d at %s.\n",
-                    "Suddenly you find your body outside of your control.  You prick your finger and\n" +
+                    "Suddenly you find your body outside of your control.\nYou prick your finger and " +
                     "write the number %d at %s in your own blood.\n",
                     "The number %d slowly fades in at cell %s.\n",
-                    "A unicorn scratches the number %d at %s with its horn, winks at you, and runs away.\n"
+                    "A unicorn scratches the number %d at %s with its horn, winks at you,\nand runs away.\n"
             ), cell.get(), cell.coords);
     }
 
     @Override
     public void gameOver() {
-        out("\n\"Your game is over!\" you hear as you suddenly notice the old man behind you.\n");
-        out("You have no idea how long he has been standing there, and are left staring at the grid:\n\n");
-        out(game.toString());
+        out("\n\"Your game is over!\" you hear as you suddenly notice the old man\nbehind you.\n\n");
+        out("You have no idea how long he has been standing there, and are left\nstaring at the grid:\n\n");
+        out(_game.toString());
+        _justCheated = true;
         out("\n");
+        out("The old man is gone, but again his voice echoes in your mind:\n\n");
+        out("\"Your final score was %d.  I thought you would do better than that!\n", _game.getScore());
+        out("You took %d turn%s, and ", _game.getTurnCount(), _game.getTurnCount() == 1 ? "" : "s");
+        if (_game.getMaxTile() == 0) out("merged no tiles!");
+        else out("merged tiles up to %d.", _game.getMaxTile());
+        out("\"\n\n\"You'll be back!  They always come back!\"\n\n");
+        log("Game over.  Final score %d, max tile %d, total turns %d", _game.getScore(), _game.getMaxTile(), _game.getTurnCount());
     }
 
     @Override
@@ -311,12 +288,12 @@ public class AdventureSession implements GameListener {
     @Override
     public void points(int newPoints, int score) {
         out(oneOf(
-                "An elf appears and informs you that you have earned %d more points for a total of %d.\n",
-                "A great clap of thunder startles you and a loud voice from the heavens shouts \"%d POINTS TO YOU!\"\nIf your math is right, that makes for a total score of %d.\n",
+                "An elf appears and informs you that you have earned %d more points\nfor a total of %d.\n",
+                "A great clap of thunder startles you and a loud voice from the heavens\nshouts \"%d POINTS TO YOU!\"\nIf your math is right, that makes for a total score of %d.\n",
                 "You earn %d more points and now have somewhere around %d.\n",
                 "You got some points or something.\n",
-                "You momentarily become one with the universe and, in your state of total consciousness,\n" +
-                "know that you just got %d more points.  So you've got that going for you, which is nice.\n"
+                "You momentarily become one with the universe and, in your state of total \n" +
+                "consciousness, know that you just got %d more points.\nSo you've got that going for you, which is nice.\n"
         ), newPoints, score);
     }
 
@@ -324,7 +301,7 @@ public class AdventureSession implements GameListener {
     public void win() {
         out("\nThe old man reappears before you, looking uncomfortable.\n\n");
         out("\"I really never expected anyone to play the whole game,\" he says.\n\n");
-        out("\"But you got yourself a genuine %d tile.  Congratulations, I guess.\n", game.getWinTile());
+        out("\"But you got yourself a genuine %d tile.  Congratulations, I guess.\n", _game.getWinTile());
         out("Since you have so much free time, go ahead and keep playing if you like.\"\n\n");
         
         out("The old man disappears.\n\n");
