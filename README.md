@@ -17,6 +17,8 @@ twothousandfortyeight
 
 Twothousandfortyeight is a text adventure version of the game [2048](http://gabrielecirulli.github.io/2048/).
 
-It listens for telnet connections on port 2048 and can built and launched via the command "**mvn compile exec:java**".
+There are two ways to build and launch with maven:
+  * Standalone from the command line via **mvn compile exec:java.
+  * Or launch a server listening for telnet connections via **mvn compile exec:java -Dexec.args="PORTNUMBER"**, where PORTNUMBER is the port you want to listen on.  Players can connect to the server via **telnet HOSTNAME PORT**.
 
-To play, use "**telnet HOSTNAME 2048**", where HOSTNAME is the name or IP of the machine it's running on.
+A public server may be occasionally available on my raspberry pi via **telnet twothousandfortyeight.martiansoftware.com 2048**
