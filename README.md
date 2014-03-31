@@ -17,6 +17,8 @@ twothousandfortyeight
 
 Twothousandfortyeight is a text adventure version of the game [2048](http://gabrielecirulli.github.io/2048/).
 
+**Note:** to call the parser rudimentary would be an understatement.  Read the in-game instructions for help.
+
 Play now on a raspberry pi server: **telnet twothousandfortyeight.martiansoftware.com 2048**<br/>
 *&#42;Guaranteed to be only occasionally available*
 
