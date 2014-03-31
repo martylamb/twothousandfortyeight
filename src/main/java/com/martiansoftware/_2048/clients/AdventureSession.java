@@ -28,7 +28,6 @@ class AdventureSession implements GameListener, TextMachine  {
     
     public AdventureSession(String logId) {
         _logId = logId;
-        restart();
     }
 
     public AdventureSession() {
@@ -45,7 +44,7 @@ class AdventureSession implements GameListener, TextMachine  {
     
     @Override
     public String start() {
-        intro();
+        restart();
         return getOutput();
     }
 
