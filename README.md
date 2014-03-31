@@ -21,7 +21,7 @@ Play now on a raspberry pi server: **telnet twothousandfortyeight.martiansoftwar
 *&#42;Guaranteed to be only occasionally available*
 
 
-There are two ways to build and launch with maven:
+Or build and launch yourself wit maven:
   * Standalone from the command line via **mvn compile exec:java.
   * Or launch a server listening for telnet connections via **mvn compile exec:java -Dexec.args="PORTNUMBER"**, where PORTNUMBER is the port you want to listen on.  Players can connect to the server via **telnet HOSTNAME PORT**.
 
