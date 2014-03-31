@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- *  TODO: console
  * @author mlamb
  */
 public class AsyncAdventureServer {
